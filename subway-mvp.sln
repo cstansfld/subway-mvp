@@ -5,9 +5,9 @@ VisualStudioVersion = 17.12.35707.178 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B5B6DA7C-8EC7-439F-9A29-343A1B600034}"
 	ProjectSection(SolutionItems) = preProject
-		..\edge-default\.editorconfig = ..\edge-default\.editorconfig
-		..\edge-default\Directory.Build.props = ..\edge-default\Directory.Build.props
-		..\edge-default\Directory.Packages.props = ..\edge-default\Directory.Packages.props
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
 		README.md = README.md
 	EndProjectSection
 EndProject
