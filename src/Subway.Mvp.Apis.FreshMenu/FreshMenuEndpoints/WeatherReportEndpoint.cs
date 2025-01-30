@@ -16,6 +16,6 @@ public static class WeatherReportEndpoint
             }
 
             throw new InvalidOperationException("This is a weatherforecast exception message.");
-        }).CacheOutput("Expire60").WithName("GetWeatherForecast").WithOpenApi();
+        }).CacheOutput("Expire60mins").WithName("GetWeatherForecast").WithOpenApi();
     }
 }

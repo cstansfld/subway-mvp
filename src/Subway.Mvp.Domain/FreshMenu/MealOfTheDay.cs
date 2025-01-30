@@ -25,6 +25,21 @@ public sealed class MealOfTheDay
         _ => Monday
     };
 
+    public static MealOfTheDay GetMealOfTheDayByUtcDate(DateTime utcDateTime)
+    {
+        return utcDateTime.DayOfWeek switch
+        {
+            DayOfWeek.Monday => Monday,
+            DayOfWeek.Tuesday => Tuesday,
+            DayOfWeek.Wednesday => Wednesday,
+            DayOfWeek.Thursday => Thursday,
+            DayOfWeek.Friday => Friday,
+            DayOfWeek.Saturday => Saturday,
+            DayOfWeek.Sunday => Sunday,
+            _ => Monday,
+        };
+    }
+
     public static MealOfTheDay Create(DayOfWeek? dayOfWeek, string? meal) => new()
     {
         Day = dayOfWeek ?? DateTime.UtcNow.DayOfWeek,

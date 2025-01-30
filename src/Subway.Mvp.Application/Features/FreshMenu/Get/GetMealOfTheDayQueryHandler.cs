@@ -9,7 +9,7 @@ internal sealed class GetMealOfTheDayQueryHandler()
     public async Task<Result<MealOfTheDayDto>> Handle(GetMealOfTheDayQuery query, CancellationToken cancellationToken)
     {
         MealOfTheDayDto mealoftheday = await Task.FromResult(
-            MealOfTheDayDto.Create(query.DateTime, query.Meal));
+            MealOfTheDayDto.Get(query.DateTime, query.Meal));
 
         return mealoftheday;
     }

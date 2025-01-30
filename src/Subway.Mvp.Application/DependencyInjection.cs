@@ -19,6 +19,7 @@ public static class DependencyInjection
 
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
+        services = services.AddMemoryCache();
         services = services.AddRequestResponse();
         services = services.AddHealthState();
 

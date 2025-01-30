@@ -16,11 +16,13 @@
     <PackageReference Include="Serilog.Enrichers.Thread" />
     <PackageReference Include="Serilog.Enrichers.Environment" />
     <PackageReference Include="Serilog.Enrichers.Process" />
-    <PackageReference Include="Swashbuckle.AspNetCore" />    
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Asp.Versioning.Http" />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Subway.Mvp.Application\Subway.Mvp.Application.csproj" />
+    <ProjectReference Include="..\Subway.Mvp.Infrastructure\Subway.Mvp.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

@@ -16,7 +16,7 @@ public class WeatherforecastTests
         await using var application = new WebApplicationFactory<Program>();
         using HttpClient client = application.CreateClient();
 
-        string[] response = await client.GetFromJsonAsync<string[]>($"/weatherforecast/{true}");
+        string[] response = await client.GetFromJsonAsync<string[]>($"v1/weatherforecast/{true}");
 
         Assert.NotNull(response);
         Assert.Equal(["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"], response);
@@ -28,7 +28,7 @@ public class WeatherforecastTests
         await using var application = new WebApplicationFactory<Program>();
         using HttpClient client = application.CreateClient();
 
-        HttpResponseMessage response = await client.GetAsync($"/weatherforecast/{false}");
+        HttpResponseMessage response = await client.GetAsync($"v1/weatherforecast/{false}");
 
         Assert.NotNull(response);
         response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError); // statuscode 500
