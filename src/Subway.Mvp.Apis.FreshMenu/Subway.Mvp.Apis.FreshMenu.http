@@ -1,0 +1,6 @@
+@Subway.Mvp.Apis.FreshMenu_HostAddress = http://localhost:5262
+
+GET {{Subway.Mvp.Apis.FreshMenu_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
