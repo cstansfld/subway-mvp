@@ -1,17 +1,19 @@
-using System.Diagnostics;
-using Asp.Versioning.Builder;
 using Asp.Versioning;
+using Asp.Versioning.Builder;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.OpenApi.Models;
 using Serilog;
 using Subway.Mvp.Apis.FreshMenu.FreshMenuEndpoints;
 using Subway.Mvp.Apis.FreshMenu.Options;
 using Subway.Mvp.Application;
+using Subway.Mvp.Application.Abstractions.Lifetime;
 using Subway.Mvp.Infrastructure;
+using Subway.Mvp.Infrastructure.Lifetime;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((context, loggerConfig) =>
     loggerConfig.ReadFrom.Configuration(context.Configuration).Enrich.FromLogContext());
+builder.Services.AddHostedService<ApplicationLifetimeService>()
+    .AddSingleton<IApplicationLifetimeService, ApplicationLifetimeService>();
 
 builder.Services.AddOutputCache(options =>
 {
@@ -38,15 +40,18 @@ builder.Services.Configure<BrotliCompressionProviderOptions>(options => options.
 builder.Services.Configure<GzipCompressionProviderOptions>(options => options.Level = System.IO.Compression.CompressionLevel.Fastest);
 
 builder.Services
-    .AddApplication()
-    .AddInfrastructure();
+    .AddApplication(builder.Configuration)
+    .AddInfrastructure()
+    .AddHostedService<FreshMenuDataStoreService>();
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddApiVersioning(options => {
+builder.Services.AddApiVersioning(options =>
+{
     options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1);
     options.ApiVersionReader = new Asp.Versioning.UrlSegmentApiVersionReader();
-}).AddApiExplorer(options => {
+}).AddApiExplorer(options =>
+{
     options.GroupNameFormat = "'v'V";
     options.SubstituteApiVersionInUrl = true;
 });
@@ -61,6 +66,8 @@ builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
 WebApplication app = builder.Build();
+
+app.StartEmbeddedFreshApiDatabase();
 
 ApiVersionSet apiVersionSet = app.NewApiVersionSet()
     .HasApiVersion(new ApiVersion(1))

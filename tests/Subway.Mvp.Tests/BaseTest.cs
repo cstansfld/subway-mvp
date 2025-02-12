@@ -10,6 +10,6 @@ public abstract class BaseTest
 {
     protected static readonly Assembly DomainAssembly = typeof(MealOfTheDay).Assembly;
     protected static readonly Assembly ApplicationAssembly = typeof(ICommand).Assembly;
-    protected static readonly Assembly InfrastructureAssembly = typeof(CacheOptions).Assembly;
+    protected static readonly Assembly InfrastructureAssembly = typeof(DefaultHybridCacheOptions).Assembly;
     protected static readonly Assembly PresentationAssembly = typeof(Program).Assembly;
 }

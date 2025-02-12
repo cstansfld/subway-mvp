@@ -45,4 +45,20 @@ public sealed class MealOfTheDay
         Day = dayOfWeek ?? DateTime.UtcNow.DayOfWeek,
         Meal = meal ?? MealOfToday.Meal
     };
+
+    public static (string Day, MealOfTheDay Meal) GetDayInfo(DayOfWeek day)
+    {
+        var dayNames = new Dictionary<DayOfWeek, (string, MealOfTheDay)>
+        {
+            { DayOfWeek.Sunday, ("Sunday", Sunday) },
+            { DayOfWeek.Monday, ("Monday", Monday) },
+            { DayOfWeek.Tuesday, ("Tuesday", Tuesday) },
+            { DayOfWeek.Wednesday, ("Wednesday", Wednesday) },
+            { DayOfWeek.Thursday, ("Thursday", Thursday) },
+            { DayOfWeek.Friday, ("Friday", Friday) },
+            { DayOfWeek.Saturday, ("Saturday", Saturday) }
+        };
+
+        return dayNames[day];
+    }
 }

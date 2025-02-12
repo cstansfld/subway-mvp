@@ -1,9 +1,13 @@
 ﻿using System.Globalization;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Hybrid;
+using Raven.Client.Documents;
+using Raven.Client.Documents.Session;
 using Subway.Mvp.Application.Features.FreshMenu;
 using Subway.Mvp.Application.Features.FreshMenu.Get;
 using Subway.Mvp.Application.Features.FreshMenu.GetAll;
+using Subway.Mvp.Domain.FreshMenu;
 using Subway.Mvp.Shared;
 
 namespace Subway.Mvp.Apis.FreshMenu.FreshMenuEndpoints;
@@ -33,6 +37,37 @@ internal static class FreshMenuEndpoints
         .MapToApiVersion(1)
         .AddEndpointFilter<FreshMenuFilters>()
         .WithTags("freshmenu v1").Produces<Result<MealOfTheDayDto>>(200)
+        .Produces<Error>(StatusCodes.Status400BadRequest).ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithDescription("FreshMenu Endpoint");
+
+        root.MapGet("meal", async (
+            DayOfWeek dayOfTheWeek,
+            HybridCache _cache,
+            IDocumentStore _documentStore,
+            CancellationToken cancellationToken) =>
+        {
+            MealOfTheDay result = await _cache.GetOrCreateAsync(
+                $"meals-by-day-{dayOfTheWeek}",
+                async ct =>
+                {
+                    // Tuple here retuns info but testing caching and seeding
+                    (string Day, MealOfTheDay _) = MealOfTheDay.GetDayInfo(dayOfTheWeek);
+                    using IAsyncDocumentSession session = _documentStore.OpenAsyncSession();
+                    MealOfTheDay meal = await
+                        session.LoadAsync<MealOfTheDay>($"MealsOfTheDay/{Day}", ct);
+                    return meal;
+                },
+                tags: [$"day-{dayOfTheWeek}", "meals"],
+                cancellationToken: cancellationToken
+            );
+            if (result is null)
+            {
+                return Results.BadRequest($"No menu option for {dayOfTheWeek}");
+            }
+            return Results.Ok(result);
+        })
+        .MapToApiVersion(1)
+        .WithTags("freshmenu v1").Produces<Result<Domain.FreshMenu.MealOfTheDay>>(200)
         .Produces<Error>(StatusCodes.Status400BadRequest).ProducesProblem(StatusCodes.Status400BadRequest)
         .WithDescription("FreshMenu Endpoint");
 

@@ -1,11 +1,12 @@
 ﻿using System.Globalization;
 using System.Text.Json;
-using Subway.Mvp.Application.Abstractions.Behaviors;
-using Subway.Mvp.Application.Abstractions.Health;
-using Subway.Mvp.Application.Health;
-using Subway.Mvp.Application.Middleware;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Subway.Mvp.Application.Abstractions.Behaviors;
+using Subway.Mvp.Application.Abstractions.Health;
+using Subway.Mvp.Application.Features.FreshMenu;
+using Subway.Mvp.Application.Health;
+using Subway.Mvp.Application.Middleware;
 
 namespace Subway.Mvp.Application;
 
@@ -17,12 +18,23 @@ public static class DependencyInjection
         set;
     }
 
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
+        services = services.GetFreshMenuStorageOptions(configuration);
         services = services.AddMemoryCache();
         services = services.AddRequestResponse();
         services = services.AddHealthState();
 
+        return services;
+    }
+
+    private static IServiceCollection GetFreshMenuStorageOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        IConfigurationSection section = configuration.GetSection(FreshMenuStorageSetup.SectionName);
+        FreshMenuStorageOptions freshMenuStorageOptions = section.Get<FreshMenuStorageOptions>()!;
+        section.Bind(freshMenuStorageOptions);
+        services.ConfigureOptions<FreshMenuStorageSetup>();
+        services.AddSingleton(freshMenuStorageOptions);
         return services;
     }
 

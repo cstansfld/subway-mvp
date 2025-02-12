@@ -31,7 +31,12 @@ These are lessons learned from many courses participated in to [Elevate Your .NE
 		3. 	The Meal of the day dto should be enough to handle all the requirements (I memory for this exercise - should be docker with database)
 
 5. Notes:
-	- Since the data for the meal of the day list doesn’t change it should be cached
+    ##### Since the data for the meal of the day list doesn’t change it should be cached
+	1. An embedded RavenDb has been added
+	2. A hosted service has been added to seed the data and cache (Hybrid .net9 pre-release) the data on first setup
+	3. What is nice about this is a redis cache canb be added as well and use l1 local and l2 redius cache
+	4. This service shuts down after seeding and caching the data
+	5. An application lifetime service service has been added to capture shutdown events
     ##### Output caching: 
 	1. The caching behavior is configurable on the server.
 	2. The client doesn't override the caching behavior that you configure on the server. (Default headers in some browser max-age 0)
