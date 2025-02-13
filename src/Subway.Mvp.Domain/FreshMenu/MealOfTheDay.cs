@@ -46,7 +46,7 @@ public sealed class MealOfTheDay
         Meal = meal ?? MealOfToday.Meal
     };
 
-    public static (string Day, MealOfTheDay Meal) GetDayInfo(DayOfWeek day)
+    public static (string Day, MealOfTheDay Meal) GetMealByDayInfo(DayOfWeek day)
     {
         var dayNames = new Dictionary<DayOfWeek, (string, MealOfTheDay)>
         {
@@ -57,6 +57,22 @@ public sealed class MealOfTheDay
             { DayOfWeek.Thursday, ("Thursday", Thursday) },
             { DayOfWeek.Friday, ("Friday", Friday) },
             { DayOfWeek.Saturday, ("Saturday", Saturday) }
+        };
+
+        return dayNames[day];
+    }
+
+    public static string GetDayName(DayOfWeek day)
+    {
+        var dayNames = new Dictionary<DayOfWeek, string>
+        {
+            { DayOfWeek.Sunday, "Sunday" },
+            { DayOfWeek.Monday, "Monday" },
+            { DayOfWeek.Tuesday, "Tuesday" },
+            { DayOfWeek.Wednesday, "Wednesday" },
+            { DayOfWeek.Thursday, "Thursday" },
+            { DayOfWeek.Friday, "Friday" },
+            { DayOfWeek.Saturday, "Saturday" }
         };
 
         return dayNames[day];

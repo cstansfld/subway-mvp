@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Raven.Embedded;
-using Subway.Mvp.Application.Abstractions.Caching;
+using Subway.Mvp.Application.Abstractions;
 using Subway.Mvp.Application.Features.FreshMenu;
 using Subway.Mvp.Infrastructure.Caching;
+using Subway.Mvp.Infrastructure.FreshMenu;
 
 namespace Subway.Mvp.Infrastructure;
 
@@ -20,7 +20,9 @@ public static class DependencyInjection
 
     private static IServiceCollection FreshApiDocumentStorage(this IServiceCollection services)
     {
-        services.AddSingleton(sp => EmbeddedServer.Instance.GetDocumentStore(sp.GetRequiredService<FreshMenuStorageOptions>().DatabaseName));
+        services.AddSingleton<IDocumentStoreContainer, FreshMenuDocumentStoreContainer>();
+
+        //services.AddSingleton(sp => EmbeddedServer.Instance.GetDocumentStore(sp.GetRequiredService<FreshMenuStorageOptions>().DatabaseName));
 
         return services;
     }
@@ -28,7 +30,8 @@ public static class DependencyInjection
     private static IServiceCollection AddCache(this IServiceCollection services)
     {
 #pragma warning disable EXTEXP0018 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-        services.AddHybridCache(options => {
+        services.AddHybridCache(options =>
+        {
             options.MaximumPayloadBytes = 1024 * 1024 * 10;
             options.MaximumKeyLength = 512;
             options.ReportTagMetrics = true;

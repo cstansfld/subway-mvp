@@ -18,6 +18,7 @@
     <PackageReference Include="AspNetCore.HealthChecks.UI.InMemory.Storage" />
     <PackageReference Include="AspNetCore.HealthChecks.Uris" />
     <PackageReference Include="Newtonsoft.Json" />
+    <PackageReference Include="RavenDB.Client" />
   </ItemGroup>
 
   <ItemGroup>

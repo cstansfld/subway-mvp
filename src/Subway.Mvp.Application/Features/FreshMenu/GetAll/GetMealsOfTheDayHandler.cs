@@ -1,5 +1,4 @@
 ﻿using Subway.Mvp.Application.Abstractions.Messaging;
-using Subway.Mvp.Application.Features.FreshMenu.Get;
 using Subway.Mvp.Shared;
 
 namespace Subway.Mvp.Application.Features.FreshMenu.GetAll;

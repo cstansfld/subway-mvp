@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
+using Subway.Mvp.Application.Abstractions;
 using Subway.Mvp.Application.Abstractions.Lifetime;
 using Subway.Mvp.Domain.FreshMenu;
 
@@ -66,7 +67,7 @@ public sealed class FreshMenuDataStoreService(IServiceScopeFactory _serviceScope
             $"meals-by-day-{dayOfTheWeek}",
             async ct =>
             {
-                (string Day, MealOfTheDay Meal) = MealOfTheDay.GetDayInfo(dayOfTheWeek);
+                (string Day, MealOfTheDay Meal) = MealOfTheDay.GetMealByDayInfo(dayOfTheWeek);
                 Meal = await
                     session.LoadAsync<MealOfTheDay>($"MealsOfTheDay/{Day}", ct);
                 return Meal;
@@ -93,18 +94,18 @@ public sealed class FreshMenuDataStoreService(IServiceScopeFactory _serviceScope
                     // if service is Singleton or Transient but if services are registered as Scoped
                     // for whatever reason (many) then this is safe way
                     await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
-                    IDocumentStore documentStore = scope.ServiceProvider.GetRequiredService<IDocumentStore>();
-                    using IAsyncDocumentSession session = documentStore.OpenAsyncSession();
+                    IDocumentStoreContainer documentStore = scope.ServiceProvider.GetRequiredService<IDocumentStoreContainer>();
+                    using IAsyncDocumentSession session = documentStore.Store.OpenAsyncSession();
                     if (await session.LoadAsync<MealOfTheDay>("MealsOfTheDay/Monday") == null)
                     {
                         // SeedsData
                         DataRequiresSeeding = true;
-                        await InitializeMealsOfTheWeek(documentStore, cancellationToken);
+                        await InitializeMealsOfTheWeek(documentStore.Store, cancellationToken);
                         _logger.LogInformation("{HostedSrvcName} SeedingData {AppTime}", HostedSrvcName, DateTimeOffset.UtcNow);
                     }
 
                     // Fills the Cache
-                    await SetupMealsOfTheWeekInCache(documentStore, cancellationToken);
+                    await SetupMealsOfTheWeekInCache(documentStore.Store, cancellationToken);
                     CacheLoaded = true;
                 }
                 catch (Exception ex)

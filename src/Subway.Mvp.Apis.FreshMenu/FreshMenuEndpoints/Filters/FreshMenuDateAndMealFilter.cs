@@ -3,13 +3,14 @@ using System.Net;
 using Subway.Mvp.Application.Features.FreshMenu;
 using Subway.Mvp.Domain.FreshMenu;
 
-namespace Subway.Mvp.Apis.FreshMenu.FreshMenuEndpoints;
+namespace Subway.Mvp.Apis.FreshMenu.FreshMenuEndpoints.Filters;
 
-public class FreshMenuFilters : IEndpointFilter
+public class FreshMenuDateAndMealFilter : IEndpointFilter
 {
     public virtual async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context,
         EndpointFilterDelegate next)
     {
+        // invalid dateformat
         string? date = context.GetArgument<string>(0);
         // not null and date has the dd component whch is not picked up py the tryParse (s)
         if (!string.IsNullOrWhiteSpace(date) && date.Split("-", StringSplitOptions.RemoveEmptyEntries).Length < 3 ||
@@ -20,8 +21,9 @@ public class FreshMenuFilters : IEndpointFilter
                 (int)HttpStatusCode.BadRequest,
                 MealOfTheDayErrors.InvalidDateError.Description);
         }
-        string meal = context.GetArgument<string>(1);
 
+        // invalid meal
+        string meal = context.GetArgument<string>(1);
         if (!string.IsNullOrWhiteSpace(meal) && !MealOfTheDayDto.GetAll().Any(x => x.Meal!.Equals(meal, StringComparison.OrdinalIgnoreCase)))
         {
             return Results.Problem(MealOfTheDayErrors.InvalidMealError.Code,
