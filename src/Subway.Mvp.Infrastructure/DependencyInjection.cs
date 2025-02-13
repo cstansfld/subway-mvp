@@ -22,8 +22,6 @@ public static class DependencyInjection
     {
         services.AddSingleton<IDocumentStoreContainer, FreshMenuDocumentStoreContainer>();
 
-        //services.AddSingleton(sp => EmbeddedServer.Instance.GetDocumentStore(sp.GetRequiredService<FreshMenuStorageOptions>().DatabaseName));
-
         return services;
     }
 
@@ -36,7 +34,6 @@ public static class DependencyInjection
             options.MaximumKeyLength = 512;
             options.ReportTagMetrics = true;
             options.DefaultEntryOptions = DefaultHybridCacheOptions.DefaultCacheSettings;
-
         });
 #pragma warning restore EXTEXP0018 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
