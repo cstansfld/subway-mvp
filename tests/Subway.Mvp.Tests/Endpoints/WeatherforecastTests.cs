@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text;
-using Subway.Mvp.Apis.FreshMenu;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Shouldly;
+using Subway.Mvp.Apis.FreshMenu;
 
 namespace Subway.Mvp.Tests.Endpoints;
 
@@ -27,8 +27,8 @@ public class WeatherforecastTests
     {
         const string DataTrackerIetfInternalServerError = "https://datatracker.ietf.org/doc/html/rfc7231#section-6.6.1";
         const string WeatherForecastDetailExceptionMessage = "This is a weatherforecast exception message.";
-        const int ExceptionsStatusCode = 500;
-        
+        const int WeatherForecastExceptionStatusCode = 500;
+
         await using var application = new WebApplicationFactory<Program>();
         using HttpClient client = application.CreateClient();
 
@@ -41,7 +41,7 @@ public class WeatherforecastTests
 
         Assert.NotNull(problemDetails);
         Assert.Equal(DataTrackerIetfInternalServerError, problemDetails.Type);
-        Assert.Equal(ExceptionsStatusCode, problemDetails.Status);
+        Assert.Equal(WeatherForecastExceptionStatusCode, problemDetails.Status);
         Assert.Equal(WeatherForecastDetailExceptionMessage, problemDetails.Detail);
     }
 
