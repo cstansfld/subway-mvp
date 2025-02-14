@@ -1,16 +1,53 @@
 ﻿using Raven.Client.Documents.Indexes;
 using Subway.Mvp.Domain.FreshMenu;
+using Subway.Mvp.Shared;
 
 namespace Subway.Mvp.Infrastructure.FreshMenu;
 
-internal static class FreshMenuIndexes
+public static class FreshMenuIndexes
 {
+    /// <summary>
+    /// GetAllFreshMenuIndexes
+    /// </summary>
+    /// <returns></returns>
+    public static List<AbstractIndexCreationTask> GetAllFreshMenuIndexes() 
+        => 
+        [
+            new AllMeals(),
+            new MealByDayOfTheWeek(),
+            new DayOfTheWeekByMeal()
+        ];
+
+
+    public sealed class AllMeals : AbstractIndexCreationTask<MealOfTheDay>
+    {
+        public sealed class IndexEntry
+        {
+            // The index-fields:
+            public string Meal { get; set; }
+            public DayOfWeek Day { get; set; }
+        }
+
+        public AllMeals()
+        {
+            Map = mealsOfTheDay => from mealOfTheDay in mealsOfTheDay
+                                   select new IndexEntry() { Day = mealOfTheDay.Day, Meal = mealOfTheDay.Meal };
+            DeploymentMode = IndexDeploymentMode.Rolling;
+            Configuration = new IndexConfiguration
+            {
+                { "Indexing.IndexMissingFieldsAsNull", "true" }
+            };
+        }
+    }
+
+
     public sealed class MealByDayOfTheWeek : AbstractIndexCreationTask<MealOfTheDay>
     {
         public sealed class IndexEntry
         {
+            public string Meal { get; set; }
             // The index-fields
-            public int Day { get; set; }
+            public DayOfWeek Day { get; set; }
         }
 
         public MealByDayOfTheWeek()
@@ -18,9 +55,15 @@ internal static class FreshMenuIndexes
             Map = mealsOfTheDay => from mealOfTheDay in mealsOfTheDay
                                    select new IndexEntry()
                                    {
+                                       Meal = mealOfTheDay.Meal,
                                        // Define the content for each index-field
-                                       Day = TryConvert<int>(mealOfTheDay.Day) ?? -1 // nullable in this case is protected by seeding (static lookup)
+                                       Day = mealOfTheDay.Day
                                    };
+            DeploymentMode = IndexDeploymentMode.Rolling;
+            Configuration = new IndexConfiguration
+            {
+                { "Indexing.IndexMissingFieldsAsNull", "true" }
+            };
         }
     }
 
@@ -30,6 +73,7 @@ internal static class FreshMenuIndexes
         {
             // The index-fields
             public string Meal { get; set; }
+            public DayOfWeek Day { get; set; }
         }
 
         public DayOfTheWeekByMeal()
@@ -38,8 +82,14 @@ internal static class FreshMenuIndexes
                                    select new IndexEntry()
                                    {
                                        // Define the content for each index-field
-                                       Meal = mealOfTheDay.Meal
+                                       Meal = mealOfTheDay.Meal,
+                                       Day = mealOfTheDay.Day
                                    };
+            DeploymentMode = IndexDeploymentMode.Rolling;
+            Configuration = new IndexConfiguration
+            {
+                { "Indexing.IndexMissingFieldsAsNull", "true" }
+            };
         }
     }
 

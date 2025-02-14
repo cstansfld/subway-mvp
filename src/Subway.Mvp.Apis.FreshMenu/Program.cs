@@ -1,4 +1,3 @@
-using Asp.Versioning;
 using Asp.Versioning.Builder;
 using Microsoft.AspNetCore.ResponseCompression;
 using Serilog;
@@ -70,7 +69,7 @@ WebApplication app = builder.Build();
 app.StartEmbeddedFreshApiDatabase();
 
 ApiVersionSet apiVersionSet = app.NewApiVersionSet()
-    .HasApiVersion(new ApiVersion(1))
+    .HasApiVersion(new Asp.Versioning.ApiVersion(1))
     .ReportApiVersions()
     .Build();
 

@@ -6,7 +6,7 @@ namespace Subway.Mvp.Tests.Endpoints;
 
 public class HealthTests
 {
-    private readonly string[] StatusValues = ["Healthy", "Degraded"];
+    private readonly string[] StatusValues = ["Healthy", "Degraded", "Unhealthy"];
 
     [Fact]
     public async Task Health_Endpoint_Check_Status()

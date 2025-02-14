@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Raven.Client.Extensions;
 using Raven.Embedded;
 using Subway.Mvp.Application.Abstractions;
 using Subway.Mvp.Application.Features.FreshMenu;
@@ -56,6 +55,6 @@ public static class DependencyInjection
         {
             // embedded server already started
         }
-        
+
     }
 }

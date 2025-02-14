@@ -13,6 +13,7 @@ public sealed class FreshMenuDocumentStoreContainer : IDocumentStoreContainer, I
     private readonly ILogger<FreshMenuDocumentStoreContainer> _logger;
     private readonly FreshMenuStorageOptions _freshMenuStoreOptions;
     private readonly IApplicationLifetimeService _applicationLifetime;
+    private readonly Lazy<IDocumentStore> _lazyStore;
 
     public FreshMenuDocumentStoreContainer(FreshMenuStorageOptions freshMenuStoreOptions,
         ILogger<FreshMenuDocumentStoreContainer> logger, IApplicationLifetimeService applicationLifetime)
@@ -21,24 +22,23 @@ public sealed class FreshMenuDocumentStoreContainer : IDocumentStoreContainer, I
         _freshMenuStoreOptions = freshMenuStoreOptions;
         _applicationLifetime = applicationLifetime;
         _applicationLifetime.ServiceClosingEvent += ApplicationLifetimeService_ServiceClosingEvent;
-        LazyStore = new(() =>
-        {
-            IDocumentStore store = Raven.Embedded.EmbeddedServer.Instance.GetDocumentStore(_freshMenuStoreOptions.DatabaseName);
-            store.OnAfterSaveChanges += DocumentStore_OnAfterSaveChanges;
-            store.OnBeforeStore += DocumentStore_OnBeforeStore;
-            store.OnSessionCreated += DocumentStore_OnSessionCreated;
-            store.OnBeforeDelete += DocumentStore_OnBeforeDelete;
-            store.OnBeforeQuery += DocumentStore_OnBeforeQuery;
-            store.OnSessionDisposing += DocumentStore_OnSessionDisposing;
-            new FreshMenuIndexes.MealByDayOfTheWeek().Execute(store);
-            new FreshMenuIndexes.DayOfTheWeekByMeal().Execute(store);
-            return store;
-        });
+        _lazyStore = new Lazy<IDocumentStore>(CreateStore);
     }
 
-    private Lazy<IDocumentStore> LazyStore { get; }
+    public IDocumentStore Store => _lazyStore.Value;
 
-    public IDocumentStore Store => LazyStore.Value;
+    private IDocumentStore CreateStore()
+    {
+        IDocumentStore store = Raven.Embedded.EmbeddedServer.Instance.GetDocumentStore(_freshMenuStoreOptions.DatabaseName);
+        store.OnAfterSaveChanges += DocumentStore_OnAfterSaveChanges;
+        store.OnBeforeStore += DocumentStore_OnBeforeStore;
+        store.OnSessionCreated += DocumentStore_OnSessionCreated;
+        store.OnBeforeDelete += DocumentStore_OnBeforeDelete;
+        store.OnBeforeQuery += DocumentStore_OnBeforeQuery;
+        store.OnSessionDisposing += DocumentStore_OnSessionDisposing;
+        store.ExecuteIndexes(FreshMenuIndexes.GetAllFreshMenuIndexes());
+        return store;
+    }
 
     private void ApplicationLifetimeService_ServiceClosingEvent(object? sender, EventArgs e)
     {
@@ -73,8 +73,8 @@ public sealed class FreshMenuDocumentStoreContainer : IDocumentStoreContainer, I
 
     private void DocumentStore_OnBeforeQuery(object? sender, BeforeQueryEventArgs e)
     {
-        _logger.LogInformation("{Name} {SessionId} {Database} {@Query}",
-            "OnBeforeQuery", e.Session.Id, e.Session.DatabaseName, e.QueryCustomization.QueryOperation.IndexQuery);
+        _logger.LogInformation("{Name} {SessionId} {Database} {Query}",
+            "OnBeforeQuery", e.Session.Id, e.Session.DatabaseName, e.QueryCustomization.ToString());
     }
 
     private void DocumentStore_OnSessionDisposing(object? sender, SessionDisposingEventArgs e)
