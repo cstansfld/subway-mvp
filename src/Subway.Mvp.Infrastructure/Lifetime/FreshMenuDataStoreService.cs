@@ -139,7 +139,7 @@ public sealed class FreshMenuDataStoreService(IServiceScopeFactory _serviceScope
 
     private void ApplicationLifetimeService_ServiceClosingEvent(object? sender, EventArgs e)
     {
-        _logger.LogInformation("FreshMenuDataStoreService received applicationClosing event.");
+        _logger.LogInformation("Received applicationClosing event.");
 
         _applicationLifetimeService.ServiceClosingEvent -= ApplicationLifetimeService_ServiceClosingEvent;
     }

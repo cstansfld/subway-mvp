@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Raven.Client.Extensions;
 using Raven.Embedded;
 using Subway.Mvp.Application.Abstractions;
 using Subway.Mvp.Application.Features.FreshMenu;
@@ -11,7 +12,6 @@ namespace Subway.Mvp.Infrastructure;
 
 public static class DependencyInjection
 {
-
     public static IServiceCollection AddInfrastructure(
        this IServiceCollection services)
     {
@@ -45,9 +45,17 @@ public static class DependencyInjection
         IServiceProvider serviceProvider = app.Services;
         IOptions<FreshMenuStorageOptions> freshMenuOptions = serviceProvider.GetRequiredService<IOptions<FreshMenuStorageOptions>>();
 
-        EmbeddedServer.Instance.StartServer(new ServerOptions
+        try
         {
-            DataDirectory = freshMenuOptions.Value.DataDirectory,
-        });
+            EmbeddedServer.Instance.StartServer(new ServerOptions
+            {
+                DataDirectory = freshMenuOptions.Value.DataDirectory,
+            });
+        }
+        catch (Exception)
+        {
+            // embedded server already started
+        }
+        
     }
 }

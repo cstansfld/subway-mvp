@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
-using Raven.Embedded;
 using Subway.Mvp.Application.Abstractions;
+using Subway.Mvp.Application.Abstractions.Lifetime;
 using Subway.Mvp.Application.Features.FreshMenu;
+using Subway.Mvp.Infrastructure.Lifetime;
 
 namespace Subway.Mvp.Infrastructure.FreshMenu;
 
@@ -11,15 +12,18 @@ public sealed class FreshMenuDocumentStoreContainer : IDocumentStoreContainer, I
 {
     private readonly ILogger<FreshMenuDocumentStoreContainer> _logger;
     private readonly FreshMenuStorageOptions _freshMenuStoreOptions;
+    private readonly IApplicationLifetimeService _applicationLifetime;
 
     public FreshMenuDocumentStoreContainer(FreshMenuStorageOptions freshMenuStoreOptions,
-        ILogger<FreshMenuDocumentStoreContainer> logger)
+        ILogger<FreshMenuDocumentStoreContainer> logger, IApplicationLifetimeService applicationLifetime)
     {
         _logger = logger;
         _freshMenuStoreOptions = freshMenuStoreOptions;
+        _applicationLifetime = applicationLifetime;
+        _applicationLifetime.ServiceClosingEvent += ApplicationLifetimeService_ServiceClosingEvent;
         LazyStore = new(() =>
         {
-            IDocumentStore store = EmbeddedServer.Instance.GetDocumentStore(_freshMenuStoreOptions.DatabaseName);
+            IDocumentStore store = Raven.Embedded.EmbeddedServer.Instance.GetDocumentStore(_freshMenuStoreOptions.DatabaseName);
             store.OnAfterSaveChanges += DocumentStore_OnAfterSaveChanges;
             store.OnBeforeStore += DocumentStore_OnBeforeStore;
             store.OnSessionCreated += DocumentStore_OnSessionCreated;
@@ -35,6 +39,13 @@ public sealed class FreshMenuDocumentStoreContainer : IDocumentStoreContainer, I
     private Lazy<IDocumentStore> LazyStore { get; }
 
     public IDocumentStore Store => LazyStore.Value;
+
+    private void ApplicationLifetimeService_ServiceClosingEvent(object? sender, EventArgs e)
+    {
+        _logger.LogInformation("Received applicationClosing event.");
+
+        _applicationLifetime.ServiceClosingEvent -= ApplicationLifetimeService_ServiceClosingEvent;
+    }
 
     private void DocumentStore_OnBeforeStore(object? sender, BeforeStoreEventArgs e)
     {

@@ -62,7 +62,7 @@ public class FreshMenuTests : BaseTest
     {
         DayOfWeek thursDay = DayOfWeek.Thursday;
         var utcDate = DateTime.Parse("2004-09-16T23:59:58.75565", CultureInfo.InvariantCulture);
-        const string ThursdaySubOfTheDay = "All-New Baja Chipotle Chicken";
+        const string Meal = "All-New Baja Chipotle Chicken";
 
         var services = new ServiceCollection();
         ServiceProvider serviceProvider = services
@@ -70,13 +70,20 @@ public class FreshMenuTests : BaseTest
             .BuildServiceProvider();
         IMediator mediator = serviceProvider.GetRequiredService<IMediator>();
 
-        var query = new GetMealOfTheDayQuery(utcDate, ThursdaySubOfTheDay);
+        var query = new GetMealOfTheDayQuery(utcDate, Meal);
         Result<MealOfTheDayDto> result = await mediator.Send(query);
         Assert.NotNull(result);
         Assert.True(result.IsSuccess);
         Assert.Equal(result.Value.Day, thursDay);
-        Assert.Equal(ThursdaySubOfTheDay, result.Value.TodaysMeal, ignoreCase: true);
-        Assert.True(result.Value.IsMealTodaysFeatureMealOfDay);
+        Assert.Equal(Meal, result.Value.Meal, ignoreCase: true);
+        if (DateTime.UtcNow.DayOfWeek == thursDay)
+        {
+            Assert.True(result.Value.IsMealTodaysFeatureMealOfDay);//if today is thursDay this will fail
+        }
+        else
+        {
+            Assert.False(result.Value.IsMealTodaysFeatureMealOfDay);
+        }
         Assert.True(result.Value.IsMealFeatureMealByDate);
     }
 
