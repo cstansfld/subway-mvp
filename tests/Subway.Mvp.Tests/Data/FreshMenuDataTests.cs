@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using System.Security.Principal;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents.Session;
@@ -90,5 +91,30 @@ public class FreshMenuDataTests
         Assert.NotNull(afterVote);
         Assert.Equal(beforeVoteCount + 1, voteplaced.VotedFor);
         Assert.Equal(afterVoteCount, voteplaced.VotedFor);
+    }
+
+    [Fact]
+    public async Task FreshMenu_Data_Vote_Summary()
+    {
+        await using var application = new WebApplicationFactory<Program>();
+        IServiceProvider _serviceProvider = application.Services;
+        IServiceScopeFactory _serviceScopeFactory = _serviceProvider.GetRequiredService<IServiceScopeFactory>();
+        await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
+        IDocumentStoreContainer documentStore = scope.ServiceProvider.GetRequiredService<IDocumentStoreContainer>();
+        using IAsyncDocumentSession session = documentStore.Store.OpenAsyncSession();
+        List<FreshMenuIndexes.AllVotes.VoteIndex> voteSummary =
+            await session.Query<FreshMenuIndexes.AllVotes.VoteIndex, FreshMenuIndexes.AllVotes>()
+            .ToListAsync();
+        Assert.NotNull(voteSummary);
+        int total = voteSummary.Sum(x => x.VotedFor);
+        var results = (from x in voteSummary
+                       select new
+                       {
+                           Total = total,
+                           Category = x.Meal,
+                           x.VotedFor,
+                           AsPercentOf = total > 0 ? ((decimal)x.VotedFor / total * 100) : 0
+                       }).ToList();
+        Assert.NotNull(results);
     }
 }
