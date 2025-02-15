@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Hybrid;
 using Raven.Client.Documents.Session;
-using Subway.Mvp.Application.Abstractions;
+using Subway.Mvp.Application.Abstractions.Data;
 using Subway.Mvp.Application.Abstractions.Messaging;
 using Subway.Mvp.Domain.FreshMenu;
 using Subway.Mvp.Shared;

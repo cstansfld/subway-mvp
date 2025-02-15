@@ -4,9 +4,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
-using Subway.Mvp.Application.Abstractions;
+using Subway.Mvp.Application.Abstractions.Data;
 using Subway.Mvp.Application.Abstractions.Lifetime;
 using Subway.Mvp.Domain.FreshMenu;
+using Subway.Mvp.Domain.FreshMenuVotes;
 
 namespace Subway.Mvp.Infrastructure.Lifetime;
 
@@ -48,6 +49,26 @@ public sealed class FreshMenuDataStoreService(IServiceScopeFactory _serviceScope
         await session.SaveChangesAsync(cancellationToken);
     }
 
+    private async Task InitializeFreshMenuVotes(IDocumentStore documentStore, CancellationToken cancellationToken)
+    {
+        using IAsyncDocumentSession session = documentStore.OpenAsyncSession();
+        await session.StoreAsync(new FreshMenuVote() { Meal = MealOfTheDay.Sunday.Meal, VotedFor = 0 },
+            $"FreshMenuVotes/{MealOfTheDay.Sunday.Meal}", cancellationToken);
+        await session.StoreAsync(new FreshMenuVote() { Meal = MealOfTheDay.Monday.Meal, VotedFor = 0 },
+            $"FreshMenuVotes/{MealOfTheDay.Monday.Meal}", cancellationToken);
+        await session.StoreAsync(new FreshMenuVote() { Meal = MealOfTheDay.Tuesday.Meal, VotedFor = 0 },
+            $"FreshMenuVotes/{MealOfTheDay.Tuesday.Meal}", cancellationToken);
+        await session.StoreAsync(new FreshMenuVote() { Meal = MealOfTheDay.Wednesday.Meal, VotedFor = 0 },
+            $"FreshMenuVotes/{MealOfTheDay.Wednesday.Meal}", cancellationToken);
+        await session.StoreAsync(new FreshMenuVote() { Meal = MealOfTheDay.Thursday.Meal, VotedFor = 0 },
+            $"FreshMenuVotes/{MealOfTheDay.Thursday.Meal}", cancellationToken);
+        await session.StoreAsync(new FreshMenuVote() { Meal = MealOfTheDay.Friday.Meal, VotedFor = 0 },
+            $"FreshMenuVotes/{MealOfTheDay.Friday.Meal}", cancellationToken);
+        await session.StoreAsync(new FreshMenuVote() { Meal = MealOfTheDay.Saturday.Meal, VotedFor = 0 },
+            $"FreshMenuVotes/{MealOfTheDay.Saturday.Meal}", cancellationToken);
+        await session.SaveChangesAsync(cancellationToken);
+    }
+
     private async Task SetupMealsOfTheWeekInCache(IDocumentStore documentStore, CancellationToken cancellationToken)
     {
         using IAsyncDocumentSession session = documentStore.OpenAsyncSession();
@@ -77,7 +98,6 @@ public sealed class FreshMenuDataStoreService(IServiceScopeFactory _serviceScope
         );
     }
 
-
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("{HostedSrvcName} Starting", HostedSrvcName);
@@ -100,8 +120,23 @@ public sealed class FreshMenuDataStoreService(IServiceScopeFactory _serviceScope
                     {
                         // SeedsData
                         DataRequiresSeeding = true;
+
+                        _logger.LogInformation("{HostedSrvcName} SeedingData for {BucketName} {AppTime}",
+                            HostedSrvcName, nameof(MealOfTheDay), DateTimeOffset.UtcNow);
+
                         await InitializeMealsOfTheWeek(documentStore.Store, cancellationToken);
-                        _logger.LogInformation("{HostedSrvcName} SeedingData {AppTime}", HostedSrvcName, DateTimeOffset.UtcNow);
+                    }
+
+                    if (await session.LoadAsync<FreshMenuVote>($"FreshMenuVotes/{MealOfTheDay.Sunday.Meal}") == null)
+                    {
+
+                        // SeedsData
+                        DataRequiresSeeding = true;
+
+                        _logger.LogInformation("{HostedSrvcName} SeedingData for {BucketName} {AppTime}",
+                            HostedSrvcName, nameof(FreshMenuVote), DateTimeOffset.UtcNow);
+
+                        await InitializeFreshMenuVotes(documentStore.Store, cancellationToken);
                     }
 
                     // Fills the Cache

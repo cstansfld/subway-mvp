@@ -2,9 +2,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Raven.Embedded;
-using Subway.Mvp.Application.Abstractions;
+using Subway.Mvp.Application.Abstractions.Data;
 using Subway.Mvp.Application.Features.FreshMenu;
 using Subway.Mvp.Infrastructure.Caching;
+using Subway.Mvp.Infrastructure.Database;
 using Subway.Mvp.Infrastructure.FreshMenu;
 
 namespace Subway.Mvp.Infrastructure;
@@ -20,6 +21,7 @@ public static class DependencyInjection
     private static IServiceCollection FreshApiDocumentStorage(this IServiceCollection services)
     {
         services.AddSingleton<IDocumentStoreContainer, FreshMenuDocumentStoreContainer>();
+        services.AddSingleton<IApplicationDbContext, ApplicationDbContext>();
 
         return services;
     }

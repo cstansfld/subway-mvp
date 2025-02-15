@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
-using Subway.Mvp.Application.Abstractions;
+using Subway.Mvp.Application.Abstractions.Data;
 using Subway.Mvp.Application.Abstractions.Lifetime;
 using Subway.Mvp.Application.Features.FreshMenu;
 using Subway.Mvp.Infrastructure.Lifetime;
@@ -111,6 +111,11 @@ public sealed class FreshMenuDocumentStoreContainer : IDocumentStoreContainer, I
             }
             disposed = true;
         }
+    }
+
+    public async Task SaveChangesAsync(IAsyncDocumentSession session, CancellationToken cancellationToken = default)
+    {
+        await session.SaveChangesAsync(cancellationToken);
     }
 
     #endregion

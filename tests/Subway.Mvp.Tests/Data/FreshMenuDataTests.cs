@@ -3,7 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents.Session;
 using Subway.Mvp.Apis.FreshMenu;
-using Subway.Mvp.Application.Abstractions;
+using Subway.Mvp.Application.Abstractions.Data;
+using Subway.Mvp.Domain.FreshMenuVotes;
 using Subway.Mvp.Infrastructure.FreshMenu;
 
 namespace Subway.Mvp.Tests.Data;
@@ -68,5 +69,26 @@ public class FreshMenuDataTests
         FreshMenuIndexes.DayOfTheWeekByMeal.IndexEntry meal = meals[0];
         Assert.NotNull(meal);
         Assert.Equal(wednesdayMeal, meal.Meal);
+    }
+
+
+    [Fact]
+    public async Task FreshMenu_Data_Vote_For_A_Fresh_Menu_Meal_By_Name_Meatball_Marinara()
+    {
+        string wednesdayMeal = "Meatball Marinara";
+        await using var application = new WebApplicationFactory<Program>();
+        IServiceProvider _serviceProvider = application.Services;
+        IApplicationDbContext _applicationDbContext = _serviceProvider.GetRequiredService<IApplicationDbContext>();
+
+        List<FreshMenuVote> beforeVote = await _applicationDbContext.GetAllFreshMenuVotes();
+        int beforeVoteCount = beforeVote.First(x => x.Meal == wednesdayMeal).VotedFor;
+        FreshMenuVote voteplaced = await _applicationDbContext.VoteForFreshMenuMeal(wednesdayMeal);
+        List<FreshMenuVote> afterVote = await _applicationDbContext.GetAllFreshMenuVotes();
+        int afterVoteCount = afterVote.First(x => x.Meal == wednesdayMeal).VotedFor;
+        Assert.NotNull(beforeVote);
+        Assert.NotNull(voteplaced);
+        Assert.NotNull(afterVote);
+        Assert.Equal(beforeVoteCount + 1, voteplaced.VotedFor);
+        Assert.Equal(afterVoteCount, voteplaced.VotedFor);
     }
 }
