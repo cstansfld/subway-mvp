@@ -1,7 +1,7 @@
 ﻿using Subway.Mvp.Application.Abstractions.Messaging;
 using Subway.Mvp.Shared;
 
-namespace Subway.Mvp.Application.Features.FreshMenu.Get;
+namespace Subway.Mvp.Application.Features.FreshMenu.Meals.Get;
 
 internal sealed class GetMealOfTheDayQueryHandler()
     : IQueryHandler<GetMealOfTheDayQuery, MealOfTheDayDto>

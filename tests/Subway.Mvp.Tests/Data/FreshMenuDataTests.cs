@@ -1,5 +1,4 @@
-﻿using System.Security.Principal;
-using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents.Session;
@@ -73,19 +72,25 @@ public class FreshMenuDataTests
     }
 
 
-    [Fact]
-    public async Task FreshMenu_Data_Vote_For_A_Fresh_Menu_Meal_By_Name_Meatball_Marinara()
+    [Theory]
+    [InlineData("The Philly")]
+    [InlineData("Cold Cut Combo")]
+    [InlineData("All-Pro Sweet Onion Chicken Teriyaki")]
+    [InlineData("Meatball Marinara")]
+    [InlineData("All-New Baja Chipotle Chicken")]
+    [InlineData("Tuna")]
+    [InlineData("The Ultimate B.M.T.")]
+    public async Task FreshMenu_Data_Vote_For_A_Fresh_Menu_Meal_By_Fresh_Meal_Name(string freshMealName)
     {
-        string wednesdayMeal = "Meatball Marinara";
         await using var application = new WebApplicationFactory<Program>();
         IServiceProvider _serviceProvider = application.Services;
         IApplicationDbContext _applicationDbContext = _serviceProvider.GetRequiredService<IApplicationDbContext>();
 
         List<FreshMenuVote> beforeVote = await _applicationDbContext.GetAllFreshMenuVotes();
-        int beforeVoteCount = beforeVote.First(x => x.Meal == wednesdayMeal).VotedFor;
-        FreshMenuVote voteplaced = await _applicationDbContext.VoteForFreshMenuMeal(wednesdayMeal);
+        int beforeVoteCount = beforeVote.First(x => x.Meal == freshMealName).VotedFor;
+        FreshMenuVote voteplaced = await _applicationDbContext.VoteForFreshMenuMeal(freshMealName);
         List<FreshMenuVote> afterVote = await _applicationDbContext.GetAllFreshMenuVotes();
-        int afterVoteCount = afterVote.First(x => x.Meal == wednesdayMeal).VotedFor;
+        int afterVoteCount = afterVote.First(x => x.Meal == freshMealName).VotedFor;
         Assert.NotNull(beforeVote);
         Assert.NotNull(voteplaced);
         Assert.NotNull(afterVote);
@@ -116,5 +121,6 @@ public class FreshMenuDataTests
                            AsPercentOf = total > 0 ? ((decimal)x.VotedFor / total * 100) : 0
                        }).ToList();
         Assert.NotNull(results);
+        Assert.True(results.Sum(x => x.AsPercentOf) > 99);
     }
 }

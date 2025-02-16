@@ -2,6 +2,7 @@
 using Subway.Mvp.Domain.FreshMenu;
 using Subway.Mvp.Domain.FreshMenuVotes;
 using Subway.Mvp.Shared;
+using static Subway.Mvp.Infrastructure.FreshMenu.FreshMenuIndexes.AllVotes.VoteIndex;
 
 namespace Subway.Mvp.Infrastructure.FreshMenu;
 
@@ -107,12 +108,14 @@ public static class FreshMenuIndexes
 
         public AllVotes()
         {
-            Map = freshMenuVotes => from freshMenuVote in freshMenuVotes
-                                    select new VoteIndex()
-                                    { 
-                                        Meal = freshMenuVote.Meal,
-                                        VotedFor = freshMenuVote.VotedFor
-                                    };
+            Map = freshMenuVotes =>
+                from freshMenuVote in freshMenuVotes
+                select new VoteIndex()
+                {
+                    // Define the content for each index-field
+                    Meal = freshMenuVote.Meal,
+                    VotedFor = freshMenuVote.VotedFor
+                };
             DeploymentMode = IndexDeploymentMode.Rolling;
             Configuration = new IndexConfiguration
             {

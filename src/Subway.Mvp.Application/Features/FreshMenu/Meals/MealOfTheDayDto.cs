@@ -1,6 +1,6 @@
 ﻿using Subway.Mvp.Domain.FreshMenu;
 
-namespace Subway.Mvp.Application.Features.FreshMenu;
+namespace Subway.Mvp.Application.Features.FreshMenu.Meals;
 
 public sealed record MealOfTheDayDto(DateTime? DateTime, string? Meal)
 {

@@ -4,9 +4,9 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Subway.Mvp.Apis.FreshMenu;
-using Subway.Mvp.Application.Features.FreshMenu;
-using Subway.Mvp.Application.Features.FreshMenu.Get;
-using Subway.Mvp.Application.Features.FreshMenu.GetAll;
+using Subway.Mvp.Application.Features.FreshMenu.Meals;
+using Subway.Mvp.Application.Features.FreshMenu.Meals.Get;
+using Subway.Mvp.Application.Features.FreshMenu.Meals.GetAll;
 using Subway.Mvp.Shared;
 
 namespace Subway.Mvp.Tests.Endpoints;

@@ -17,7 +17,9 @@ public class FreshMenuDaysOfTheWeekFilter : IEndpointFilter
             return Results.Problem(MealOfTheDayErrors.InvalidDayOfTheWeekError.Code,
                 $"{context.HttpContext.Request.Scheme}://{context.HttpContext.Request.Host}{context.HttpContext.Request.Path}",
                 (int)HttpStatusCode.BadRequest,
-                MealOfTheDayErrors.InvalidDayOfTheWeekError.Description);
+                MealOfTheDayErrors.InvalidDayOfTheWeekError.Description,
+                type: $"{MealOfTheDayErrors.InvalidDayOfTheWeekError.Type}",
+                extensions: new Dictionary<string, object?> { ["requestId"] = context.HttpContext.TraceIdentifier });
         }
         return await next(context);
     }

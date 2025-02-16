@@ -5,7 +5,7 @@ using Subway.Mvp.Application.Abstractions.Messaging;
 using Subway.Mvp.Domain.FreshMenu;
 using Subway.Mvp.Shared;
 
-namespace Subway.Mvp.Application.Features.FreshMenu.GetOne;
+namespace Subway.Mvp.Application.Features.FreshMenu.Meals.GetOne;
 
 internal sealed class GetMealByDayOfTheWeekQueryHandler(HybridCache _cache,
             IDocumentStoreContainer _documentStore, ILogger<GetMealByDayOfTheWeekQueryHandler> _logger)

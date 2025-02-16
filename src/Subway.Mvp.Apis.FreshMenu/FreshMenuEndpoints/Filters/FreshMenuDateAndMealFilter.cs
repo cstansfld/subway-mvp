@@ -1,7 +1,8 @@
 ﻿using System.Globalization;
 using System.Net;
-using Subway.Mvp.Application.Features.FreshMenu;
+using Subway.Mvp.Application.Features.FreshMenu.Meals;
 using Subway.Mvp.Domain.FreshMenu;
+using Subway.Mvp.Domain.FreshMenuVotes;
 
 namespace Subway.Mvp.Apis.FreshMenu.FreshMenuEndpoints.Filters;
 
@@ -19,7 +20,9 @@ public class FreshMenuDateAndMealFilter : IEndpointFilter
             return Results.Problem(MealOfTheDayErrors.InvalidDateError.Code,
                 $"{context.HttpContext.Request.Scheme}://{context.HttpContext.Request.Host}{context.HttpContext.Request.Path}",
                 (int)HttpStatusCode.BadRequest,
-                MealOfTheDayErrors.InvalidDateError.Description);
+                MealOfTheDayErrors.InvalidDateError.Description,
+                type: $"{MealOfTheDayErrors.InvalidDateError.Type}",
+                extensions: new Dictionary<string, object?> { ["requestId"] = context.HttpContext.TraceIdentifier });
         }
 
         // invalid meal
@@ -29,7 +32,9 @@ public class FreshMenuDateAndMealFilter : IEndpointFilter
             return Results.Problem(MealOfTheDayErrors.InvalidMealError.Code,
                 $"{context.HttpContext.Request.Scheme}://{context.HttpContext.Request.Host}{context.HttpContext.Request.Path}",
                 (int)HttpStatusCode.BadRequest,
-                MealOfTheDayErrors.InvalidMealError.Description);
+                MealOfTheDayErrors.InvalidMealError.Description,
+                type: $"{MealOfTheDayErrors.InvalidMealError.Type}",
+                extensions: new Dictionary<string, object?> { ["requestId"] = context.HttpContext.TraceIdentifier });
         }
         return await next(context);
     }

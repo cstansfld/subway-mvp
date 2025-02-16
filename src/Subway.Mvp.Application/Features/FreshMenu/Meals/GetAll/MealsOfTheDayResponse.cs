@@ -1,4 +1,4 @@
-﻿namespace Subway.Mvp.Application.Features.FreshMenu.GetAll;
+﻿namespace Subway.Mvp.Application.Features.FreshMenu.Meals.GetAll;
 
 public sealed class MealsOfTheDayResponse
 {
