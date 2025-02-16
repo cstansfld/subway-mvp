@@ -6,6 +6,7 @@ using Subway.Mvp.Application.Features.FreshMenu.Meals.Get;
 using Subway.Mvp.Application.Features.FreshMenu.Meals.GetAll;
 using Subway.Mvp.Application.Features.FreshMenu.Meals.GetOne;
 using Subway.Mvp.Application.Features.FreshMenu.Votes.Create;
+using Subway.Mvp.Application.Features.FreshMenu.Votes.GetSummary;
 using Subway.Mvp.Shared;
 
 namespace Subway.Mvp.Apis.FreshMenu.FreshMenuEndpoints;
@@ -88,7 +89,24 @@ internal static class FreshMenuEndpoints
         })
         .MapToApiVersion(1)
         .AddEndpointFilter<FreshMenuMealFilter>()
-        .WithTags("freshmenu vote v1").Produces<Result<VoteForFreshMealResponse>>(200)
+        .WithTags("freshmenu vote summary v1").Produces<Result<VoteForFreshMealResponse>>(200)
+        .Produces<Error>(StatusCodes.Status400BadRequest).ProducesProblem(StatusCodes.Status400BadRequest)
+        .WithDescription("FreshMenu Endpoint");
+
+        root.MapPost("votesummary", async (
+            ISender _sender,
+            CancellationToken cancellationToken) =>
+                {
+                    Result<AllVotesSummaryResponse> result = await _sender.Send(
+                        new GetAllVotesQuery(), cancellationToken);
+                    if (result.IsFailure)
+                    {
+                        return Results.BadRequest(result.Error);
+                    }
+                    return Results.Ok(result);
+                })
+        .MapToApiVersion(1)
+        .WithTags("freshmenu vote summary v1").Produces<Result<AllVotesSummaryResponse>>(200)
         .Produces<Error>(StatusCodes.Status400BadRequest).ProducesProblem(StatusCodes.Status400BadRequest)
         .WithDescription("FreshMenu Endpoint");
     }

@@ -4,8 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents.Session;
 using Subway.Mvp.Apis.FreshMenu;
 using Subway.Mvp.Application.Abstractions.Data;
+using Subway.Mvp.Application.Features.FreshMenu;
 using Subway.Mvp.Domain.FreshMenuVotes;
-using Subway.Mvp.Infrastructure.FreshMenu;
 
 namespace Subway.Mvp.Tests.Data;
 public class FreshMenuDataTests
@@ -19,8 +19,8 @@ public class FreshMenuDataTests
         await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
         IDocumentStoreContainer documentStore = scope.ServiceProvider.GetRequiredService<IDocumentStoreContainer>();
         using IAsyncDocumentSession session = documentStore.Store.OpenAsyncSession();
-        List<FreshMenuIndexes.AllMeals.IndexEntry> meals =
-            await session.Query<FreshMenuIndexes.AllMeals.IndexEntry, FreshMenuIndexes.AllMeals>()
+        List<AllMeals.IndexEntry> meals =
+            await session.Query<AllMeals.IndexEntry, AllMeals>()
             .ToListAsync();
         Assert.NotNull(session);
         Assert.NotNull(meals);
@@ -37,14 +37,14 @@ public class FreshMenuDataTests
         await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
         IDocumentStoreContainer documentStore = scope.ServiceProvider.GetRequiredService<IDocumentStoreContainer>();
         using IAsyncDocumentSession session = documentStore.Store.OpenAsyncSession();
-        List<FreshMenuIndexes.MealByDayOfTheWeek.IndexEntry> meals =
-            await session.Query<FreshMenuIndexes.MealByDayOfTheWeek.IndexEntry, FreshMenuIndexes.MealByDayOfTheWeek>()
+        List<MealByDayOfTheWeek.IndexEntry> meals =
+            await session.Query<MealByDayOfTheWeek.IndexEntry, MealByDayOfTheWeek>()
                 .Where(x => x.Day == tuesday)
                 .ToListAsync();
         Assert.NotNull(session);
         Assert.NotNull(meals);
         Assert.Single(meals);
-        FreshMenuIndexes.MealByDayOfTheWeek.IndexEntry meal = meals[0];
+        MealByDayOfTheWeek.IndexEntry meal = meals[0];
         Assert.NotNull(meal);
         Assert.Equal(tuesday, meal.Day);
     }
@@ -59,14 +59,14 @@ public class FreshMenuDataTests
         await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
         IDocumentStoreContainer documentStore = scope.ServiceProvider.GetRequiredService<IDocumentStoreContainer>();
         using IAsyncDocumentSession session = documentStore.Store.OpenAsyncSession();
-        List<FreshMenuIndexes.DayOfTheWeekByMeal.IndexEntry> meals =
-            await session.Query<FreshMenuIndexes.DayOfTheWeekByMeal.IndexEntry, FreshMenuIndexes.DayOfTheWeekByMeal>()
+        List<DayOfTheWeekByMeal.IndexEntry> meals =
+            await session.Query<DayOfTheWeekByMeal.IndexEntry, DayOfTheWeekByMeal>()
                 .Where(x => x.Meal == wednesdayMeal)
                 .ToListAsync();
         Assert.NotNull(session);
         Assert.NotNull(meals);
         Assert.Single(meals);
-        FreshMenuIndexes.DayOfTheWeekByMeal.IndexEntry meal = meals[0];
+        DayOfTheWeekByMeal.IndexEntry meal = meals[0];
         Assert.NotNull(meal);
         Assert.Equal(wednesdayMeal, meal.Meal);
     }
@@ -86,10 +86,10 @@ public class FreshMenuDataTests
         IServiceProvider _serviceProvider = application.Services;
         IApplicationDbContext _applicationDbContext = _serviceProvider.GetRequiredService<IApplicationDbContext>();
 
-        List<FreshMenuVote> beforeVote = await _applicationDbContext.GetAllFreshMenuVotes();
+        List<AllVotes.IndexEntry> beforeVote = await _applicationDbContext.GetAllFreshMenuVotes();
         int beforeVoteCount = beforeVote.First(x => x.Meal == freshMealName).VotedFor;
         FreshMenuVote voteplaced = await _applicationDbContext.VoteForFreshMenuMeal(freshMealName);
-        List<FreshMenuVote> afterVote = await _applicationDbContext.GetAllFreshMenuVotes();
+        List<AllVotes.IndexEntry> afterVote = await _applicationDbContext.GetAllFreshMenuVotes();
         int afterVoteCount = afterVote.First(x => x.Meal == freshMealName).VotedFor;
         Assert.NotNull(beforeVote);
         Assert.NotNull(voteplaced);
@@ -107,8 +107,8 @@ public class FreshMenuDataTests
         await using AsyncServiceScope scope = _serviceScopeFactory.CreateAsyncScope();
         IDocumentStoreContainer documentStore = scope.ServiceProvider.GetRequiredService<IDocumentStoreContainer>();
         using IAsyncDocumentSession session = documentStore.Store.OpenAsyncSession();
-        List<FreshMenuIndexes.AllVotes.VoteIndex> voteSummary =
-            await session.Query<FreshMenuIndexes.AllVotes.VoteIndex, FreshMenuIndexes.AllVotes>()
+        List<AllVotes.IndexEntry> voteSummary =
+            await session.Query<AllVotes.IndexEntry, AllVotes>()
             .ToListAsync();
         Assert.NotNull(voteSummary);
         int total = voteSummary.Sum(x => x.VotedFor);

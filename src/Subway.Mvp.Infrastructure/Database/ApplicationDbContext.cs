@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Subway.Mvp.Application.Abstractions.Data;
+using Subway.Mvp.Application.Features.FreshMenu;
 using Subway.Mvp.Domain.FreshMenuVotes;
-using Subway.Mvp.Infrastructure.FreshMenu;
 
 namespace Subway.Mvp.Infrastructure.Database;
 
@@ -9,10 +9,10 @@ public sealed class ApplicationDbContext(IDocumentStoreContainer documentStoreCo
 {
     private const string VotesKey = "FreshMenuVotes";
 
-    public async Task<List<FreshMenuVote>> GetAllFreshMenuVotes(CancellationToken cancellationToken = default)
+    public async Task<List<AllVotes.IndexEntry>> GetAllFreshMenuVotes(CancellationToken cancellationToken = default)
     {
         using Raven.Client.Documents.Session.IAsyncDocumentSession session = DocumentStore.Store.OpenAsyncSession();
-        return await session.Query<FreshMenuVote>().ToListAsync(cancellationToken);
+        return await session.Query<AllVotes.IndexEntry, AllVotes>().ToListAsync(cancellationToken);
     }
 
     public async Task<FreshMenuVote> VoteForFreshMenuMeal(string meal, CancellationToken cancellationToken = default)

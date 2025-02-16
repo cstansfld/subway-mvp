@@ -33,7 +33,7 @@ internal sealed class VoteForFreshMealCommandHandler(
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error");
-            return Result.Failure<VoteForFreshMealResponse>(FreshMenuVoteErrors.VotePlacedError);
+            return Result.Failure<VoteForFreshMealResponse>(FreshMenuVoteErrors.VoteSummaryError);
         }
     }
 }
