@@ -1,0 +1,19 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "launchBrowser": true,
+      "launchUrl": "https://localhost:7194/v1/weatherforecast/true",
+      "environmentVariables": {
+        "ASPNETCORE_HTTPS_PORTS": "7194",
+        "ASPNETCORE_HTTP_PORTS": "5262"
+      },
+      "publishAllPorts": true,
+      "useSSL": true,
+      "serviceActions": {
+        "subway.mvp.apis.freshmenu": "StartDebugging"
+      }
+    }
+  }
+}

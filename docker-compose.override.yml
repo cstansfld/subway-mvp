@@ -1,0 +1,18 @@
+services:
+  subway.mvp.apis.freshmenu:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=5262
+      - ASPNETCORE_HTTPS_PORTS=7194
+    ports:
+      - "5262:5262"
+      - "7194:7194"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/.aspnet/https:/root/.aspnet/https:ro
+    healthcheck:
+      test: timeout 10s wget -qO - localhost:5262/health || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 30s

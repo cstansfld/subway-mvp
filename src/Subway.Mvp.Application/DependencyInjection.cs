@@ -58,7 +58,7 @@ public static class DependencyInjection
 
         // resolve local vs docker
         string? urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
-        string? endpoint = string.IsNullOrEmpty(urls) ? "http://localhost:8080" : urls.Split(';')[0];
+        string? endpoint = string.IsNullOrEmpty(urls) ? "http://subway.mvp.apis.freshmenu:5262" : urls.Split(';')[0];
 
         services.AddHealthChecksUI(opt =>
         {
