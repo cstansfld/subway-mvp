@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
+using Raven.Client.ServerWide;
+using Raven.Client.ServerWide.Operations;
 using Subway.Mvp.Application.Abstractions.Data;
 using Subway.Mvp.Application.Abstractions.Lifetime;
 using Subway.Mvp.Application.Features.FreshMenu;
@@ -27,9 +29,15 @@ public sealed class FreshMenuDocumentStoreContainer : IDocumentStoreContainer, I
 
     public IDocumentStore Store => _lazyStore.Value;
 
-    private IDocumentStore CreateStore()
+    private DocumentStore CreateStore()
     {
-        IDocumentStore store = Raven.Embedded.EmbeddedServer.Instance.GetDocumentStore(_freshMenuStoreOptions.DatabaseName);
+        var store = new DocumentStore()
+        {
+            Urls = [_freshMenuStoreOptions.ServerUrl],
+            Database = _freshMenuStoreOptions.DatabaseName,
+        };
+        store.Initialize();
+        store = EnsureDatabaseExists(store, _freshMenuStoreOptions.DatabaseName);
         store.OnAfterSaveChanges += DocumentStore_OnAfterSaveChanges;
         store.OnBeforeStore += DocumentStore_OnBeforeStore;
         store.OnSessionCreated += DocumentStore_OnSessionCreated;
@@ -37,6 +45,25 @@ public sealed class FreshMenuDocumentStoreContainer : IDocumentStoreContainer, I
         store.OnBeforeQuery += DocumentStore_OnBeforeQuery;
         store.OnSessionDisposing += DocumentStore_OnSessionDisposing;
         store.ExecuteIndexes(FreshMenuIndexes.GetAllFreshMenuIndexes());
+        return store;
+    }
+
+    private static DocumentStore EnsureDatabaseExists(DocumentStore store, string databaseName)
+    {
+        //var databaseRecord = new DatabaseRecord(databaseName);
+
+        DatabaseRecordWithEtag databaseRecordWithEtag = store.Maintenance.Server.Send(new GetDatabaseRecordOperation(databaseName));
+        if (databaseRecordWithEtag == null)
+        {
+            var databaseRecord = new DatabaseRecord(databaseName);
+            store.Maintenance.Server.Send(new CreateDatabaseOperation(databaseRecord));
+        }
+
+        /*using (IDocumentSession session = store.OpenSession())
+        {
+            session.Advanced.DocumentStore.Maintenance.Server.Send(
+                new Raven.Client.ServerWide.Operations.CreateDatabaseOperation(new Raven.Client.ServerWide.DatabaseRecord(databaseName)));
+        }*/
         return store;
     }
 

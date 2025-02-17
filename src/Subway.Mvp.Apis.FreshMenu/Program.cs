@@ -66,8 +66,6 @@ builder.Services.AddOpenApi();
 
 WebApplication app = builder.Build();
 
-app.StartEmbeddedFreshApiDatabase();
-
 ApiVersionSet apiVersionSet = app.NewApiVersionSet()
     .HasApiVersion(new Asp.Versioning.ApiVersion(1))
     .ReportApiVersions()

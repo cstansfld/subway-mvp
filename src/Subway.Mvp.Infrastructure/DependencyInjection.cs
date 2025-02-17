@@ -1,9 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Raven.Embedded;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Subway.Mvp.Application.Abstractions.Data;
-using Subway.Mvp.Application.Features.FreshMenu;
 using Subway.Mvp.Infrastructure.Caching;
 using Subway.Mvp.Infrastructure.Database;
 using Subway.Mvp.Infrastructure.FreshMenu;
@@ -39,24 +35,5 @@ public static class DependencyInjection
 #pragma warning restore EXTEXP0018 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
         return services;
-    }
-
-    public static void StartEmbeddedFreshApiDatabase(this WebApplication app)
-    {
-        IServiceProvider serviceProvider = app.Services;
-        IOptions<FreshMenuStorageOptions> freshMenuOptions = serviceProvider.GetRequiredService<IOptions<FreshMenuStorageOptions>>();
-
-        try
-        {
-            EmbeddedServer.Instance.StartServer(new ServerOptions
-            {
-                DataDirectory = freshMenuOptions.Value.DataDirectory,
-            });
-        }
-        catch (Exception)
-        {
-            // embedded server already started
-        }
-
     }
 }

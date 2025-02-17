@@ -47,5 +47,31 @@ These are lessons learned from many courses participated in to [Elevate Your .NE
     #### Brotli Compression / GZIP Compression content (br favored)
 	#### HealthChecks - HttpStatus and Error Tracking
 	#### Unhandled Error Handling
-	#### UnitTests Supporting use cases 
+	#### UnitTests Supporting use cases
+
+6. Docker Setup of RavenDb (Converted local EmbeddedInstance to Docker Container)
+	- Of note embedded instance has benefits and can run in container 
+		a. ensure docker storage on local
+		b. use cache l1 and l2 options to promote data while eventual consistency is managed
+	- Tested External server setup in Docker with following compose:
+	- Simple setup exposed host port on 5150
+	- todo Next steps integrate with Docket container and orchestration setup
+	```
+	services:
+	  ravendb:
+      image: ravendb/ravendb:latest
+      container_name: ravendb
+      ports:
+        - 5150:8080
+        - 38888:38888
+      environment:
+        - RAVEN_Security_UnsecuredAccessAllowed=PrivateNetwork
+        - RAVEN_Setup_Mode=Unsecured
+        - RAVEN_License_Eula_Accepted=true
+      volumes:
+        - ./.containers/ravendb/data:/var/lib/ravendb/data
+    ```
+	- requires a developer licence (https://ravendb.net/license/request/dev)
+	- if setup like above use this link to add developer license. (http://localhost:5150/studio/index.html#about)
+
 

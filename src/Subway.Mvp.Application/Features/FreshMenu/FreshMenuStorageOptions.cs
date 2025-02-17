@@ -6,6 +6,7 @@ public class FreshMenuStorageOptions
 {
     public required string DataDirectory { get; init; } = "./.containers/freshmenu/v1";
     public required string DatabaseName { get; init; } = "FreshMenuDb";
+    public required string ServerUrl { get; init; } = string.Empty;
 }
 
 public class FreshMenuStorageSetup(IConfiguration _configuration) : IConfigureOptions<FreshMenuStorageOptions>

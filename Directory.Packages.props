@@ -18,7 +18,6 @@
     <PackageVersion Include="AspNetCore.HealthChecks.Uris" Version="9.0.0" />
     <!-- Infrastructure -->
     <PackageVersion Include="RavenDB.Client" Version="7.0.0" />
-    <PackageVersion Include="RavenDB.Embedded" Version="7.0.0" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="9.2.0-preview.1.25105.6" />
     <!-- Apis -->
