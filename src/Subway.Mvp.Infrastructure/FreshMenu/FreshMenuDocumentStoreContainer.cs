@@ -6,7 +6,6 @@ using Raven.Client.ServerWide.Operations;
 using Subway.Mvp.Application.Abstractions.Data;
 using Subway.Mvp.Application.Abstractions.Lifetime;
 using Subway.Mvp.Application.Features.FreshMenu;
-using Subway.Mvp.Infrastructure.Lifetime;
 
 namespace Subway.Mvp.Infrastructure.FreshMenu;
 
@@ -37,7 +36,7 @@ public sealed class FreshMenuDocumentStoreContainer : IDocumentStoreContainer, I
             Database = _freshMenuStoreOptions.DatabaseName,
         };
         store.Initialize();
-        store = EnsureDatabaseExists(store, _freshMenuStoreOptions.DatabaseName);
+        store = EnsureDatabaseExists(store, _freshMenuStoreOptions.DatabaseName, _logger);
         store.OnAfterSaveChanges += DocumentStore_OnAfterSaveChanges;
         store.OnBeforeStore += DocumentStore_OnBeforeStore;
         store.OnSessionCreated += DocumentStore_OnSessionCreated;
@@ -48,22 +47,22 @@ public sealed class FreshMenuDocumentStoreContainer : IDocumentStoreContainer, I
         return store;
     }
 
-    private static DocumentStore EnsureDatabaseExists(DocumentStore store, string databaseName)
+    private static DocumentStore EnsureDatabaseExists(DocumentStore store, string databaseName,
+        ILogger<FreshMenuDocumentStoreContainer> logger)
     {
-        //var databaseRecord = new DatabaseRecord(databaseName);
-
-        DatabaseRecordWithEtag databaseRecordWithEtag = store.Maintenance.Server.Send(new GetDatabaseRecordOperation(databaseName));
-        if (databaseRecordWithEtag == null)
+        try
         {
-            var databaseRecord = new DatabaseRecord(databaseName);
-            store.Maintenance.Server.Send(new CreateDatabaseOperation(databaseRecord));
+            DatabaseRecordWithEtag databaseRecordWithEtag = store.Maintenance.Server.Send(new GetDatabaseRecordOperation(databaseName));
+            if (databaseRecordWithEtag == null)
+            {
+                var databaseRecord = new DatabaseRecord(databaseName);
+                store.Maintenance.Server.Send(new CreateDatabaseOperation(databaseRecord));
+            }
         }
-
-        /*using (IDocumentSession session = store.OpenSession())
+        catch (Exception ex)
         {
-            session.Advanced.DocumentStore.Maintenance.Server.Send(
-                new Raven.Client.ServerWide.Operations.CreateDatabaseOperation(new Raven.Client.ServerWide.DatabaseRecord(databaseName)));
-        }*/
+            logger.LogError(ex, "UnexpectedError verifying {Database} in {Ensure}", databaseName, nameof(EnsureDatabaseExists));
+        }
         return store;
     }
 
@@ -138,11 +137,6 @@ public sealed class FreshMenuDocumentStoreContainer : IDocumentStoreContainer, I
             }
             disposed = true;
         }
-    }
-
-    public async Task SaveChangesAsync(IAsyncDocumentSession session, CancellationToken cancellationToken = default)
-    {
-        await session.SaveChangesAsync(cancellationToken);
     }
 
     #endregion
