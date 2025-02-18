@@ -2,19 +2,21 @@
 using System.Net.Http.Json;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Shouldly;
-using Subway.Mvp.Apis.FreshMenu;
 
 namespace Subway.Mvp.Tests.Endpoints;
 
-public class WeatherforecastTests
+[Collection("FreshMenu Collection")]
+public class WeatherforecastTests : BaseFreshMenuFixture
 {
+    public WeatherforecastTests(FreshMenuIntegrationTestWebAppFactory factory) : base(factory)
+    {
+    }
+
     [Fact]
     public async Task Weatherforecast_Endpoint_Success()
     {
-        await using var application = new WebApplicationFactory<Program>();
-        using HttpClient client = application.CreateClient();
+        using HttpClient client = Factory.CreateClient();
 
         string[] response = await client.GetFromJsonAsync<string[]>($"v1/weatherforecast/{true}");
 
@@ -29,8 +31,7 @@ public class WeatherforecastTests
         const string WeatherForecastDetailExceptionMessage = "This is a weatherforecast exception message.";
         const int WeatherForecastExceptionStatusCode = 500;
 
-        await using var application = new WebApplicationFactory<Program>();
-        using HttpClient client = application.CreateClient();
+        using HttpClient client = Factory.CreateClient();
 
         HttpResponseMessage response = await client.GetAsync($"v1/weatherforecast/{false}");
 

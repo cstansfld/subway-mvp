@@ -1,18 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using Newtonsoft.Json;
-using Subway.Mvp.Apis.FreshMenu;
+﻿using Newtonsoft.Json;
 
 namespace Subway.Mvp.Tests.Endpoints;
 
-public class HealthTests
+[Collection("FreshMenu Collection")]
+public class HealthTests : BaseFreshMenuFixture
 {
     private readonly string[] StatusValues = ["Healthy", "Degraded", "Unhealthy"];
+
+    public HealthTests(FreshMenuIntegrationTestWebAppFactory factory) : base(factory)
+    {
+    }
 
     [Fact]
     public async Task Health_Endpoint_Check_Status()
     {
-        await using var application = new WebApplicationFactory<Program>();
-        using HttpClient client = application.CreateClient();
+        using HttpClient client = Factory.CreateClient();
 
         string response = await client.GetStringAsync($"/health");
         Assert.NotNull(response);

@@ -20,8 +20,11 @@ public sealed class ApplicationDbContext(IDocumentStoreContainer documentStoreCo
         using Raven.Client.Documents.Session.IAsyncDocumentSession session = DocumentStore.Store.OpenAsyncSession();
         FreshMenuVote vote = await
             session.LoadAsync<FreshMenuVote>($"{VotesKey}/{meal}", cancellationToken);
-        vote.VotedFor++;
-        await session.SaveChangesAsync(cancellationToken);
+        if (vote != null)
+        {
+            vote.VotedFor++;
+            await session.SaveChangesAsync(cancellationToken);
+        }
         return vote;
     }
 
