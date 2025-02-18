@@ -23,7 +23,7 @@ public static class DependencyInjection
         services = services.GetFreshMenuStorageOptions(configuration);
         services = services.AddMemoryCache();
         services = services.AddRequestResponse();
-        services = services.AddHealthState();
+        services = services.AddHealthState(configuration);
 
         return services;
     }
@@ -50,15 +50,27 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddHealthState(this IServiceCollection services)
+    private static HealthOptions GetHealthOptions(this IServiceCollection services, IConfiguration configuration)
+    {
+        IConfigurationSection section = configuration.GetSection(HealthOptionsSetup.SectionName);
+        HealthOptions healthOptions = section.Get<HealthOptions>()!;
+        section.Bind(healthOptions);
+        services.ConfigureOptions<HealthOptionsSetup>();
+        services.AddSingleton(healthOptions);
+        return healthOptions;
+    }
+
+    private static IServiceCollection AddHealthState(this IServiceCollection services, IConfiguration configuration)
     {
         HealthStateProp = new HealthState();
         services.AddSingleton<IHealthState>(HealthStateProp);
         services.AddHealthChecks();
 
+        HealthOptions healthOptions = services.GetHealthOptions(configuration);
+
         // resolve local vs docker
         string? urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
-        string? endpoint = string.IsNullOrEmpty(urls) ? "http://subway.mvp.apis.freshmenu:5262" : urls.Split(';')[0];
+        string? endpoint = string.IsNullOrEmpty(urls) ? healthOptions.HealthHost : urls.Split(';')[0];
 
         services.AddHealthChecksUI(opt =>
         {
