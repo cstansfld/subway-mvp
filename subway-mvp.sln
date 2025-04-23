@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		README.md = README.md
+		README1.MD.txt = README1.MD.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subway.Mvp.Shared", "src\Subway.Mvp.Shared\Subway.Mvp.Shared.csproj", "{00685A6E-BEC6-4FB8-B8F0-15E559F2C4D5}"
@@ -74,5 +75,8 @@ Global
 		{3358B3CB-4997-40D8-B4C2-94B20C0FF50B} = {A240E9B7-2A95-4B70-B5E3-28F46E2434A1}
 		{5650DCBC-0A43-400E-A252-1E716A376007} = {A240E9B7-2A95-4B70-B5E3-28F46E2434A1}
 		{EE38D8B5-6971-4A35-8745-DC612B84458E} = {A240E9B7-2A95-4B70-B5E3-28F46E2434A1}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C66C1298-920B-4DF4-8CAF-6368DF89222D}
 	EndGlobalSection
 EndGlobal
